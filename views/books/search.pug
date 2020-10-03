@@ -1,3 +1,6 @@
 form.search-bar(method="get" action="/books/search")
-    input(type="text" name="search" placeholder="...Search")
+    if search 
+        input(type="text" name="search" value=search)
+    else
+        input(type="text" name="search" placeholder="...Search")
     input(type="submit" value="Search")

@@ -1,0 +1,11 @@
+div.pagination
+    if search
+        if page>0
+            a(href=`/books/search?page=${page}&search=${search}`) < Prev
+        input(type="text" value=page+1) 
+        a(href=`/books/search?page=${page+2}&search=${search}`) Next >
+    else
+        if page>0
+            a(href=`/books/?page=${page}`) < Prev
+        input(type="text" value=page+1) 
+        a(href=`/books/?page=${page+2}`) Next >

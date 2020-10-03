@@ -3,7 +3,10 @@ const router = express.Router();
 const Book = require('../models').Book;
 const { Op } = require("sequelize");
 
-/* Handler function to wrap each route. */
+/**
+ * Handler function to wrap each route. 
+ * Taken from example projects of Team TreeHouse
+ */
 function asyncHandler(cb){
   return async(req, res, next) => {
     try {
@@ -18,8 +21,19 @@ function asyncHandler(cb){
  * GET Method that retrieves the list of all books on the DB
  */
 router.get('/', asyncHandler(async (req, res) => {
-  const books = await Book.findAll({ order: [['createdAt', 'DESC']]})
-  res.render('books/index', { books })
+  const page = (req.query.page && req.query.page > 0)  ? req.query.page - 1 : 0
+  const books = await Book.findAndCountAll({ 
+    limit: 5,
+    offset: (page) * 5,
+    order: [['createdAt', 'DESC']],
+  })
+  console.dir(books)
+  if (books.rows.length !== 0) {
+    res.render('books/index', { books: books.rows, total: books.count, page })
+  } else {
+    res.render('page_not_found')
+  }
+ 
 }));
 
 
@@ -53,11 +67,13 @@ router.post('/new', asyncHandler(async(req, res) => {
 
 
 /**
- * GET method  that will filter books by its name
+ * GET method  that will filter books by its name, author, genre or year
+ * Case insensitive
  */
 router.get('/search', asyncHandler(async(req, res) => {
+  const page = (req.query.page && req.query.page > 0)  ? req.query.page - 1 : 0
   let search = req.query.search;
-    const books = await Book.findAll({ where: {
+    const books = await Book.findAndCountAll({ where: {
       [Op.or]:[
         {
           title: {
@@ -80,9 +96,16 @@ router.get('/search', asyncHandler(async(req, res) => {
           }
         }
       ],
-    }});
-    console.dir(books)
-    res.render('books/index', { books: books, title: `${search} | Books` })
+    },
+    limit: 5,
+    offset: (page) * 5,
+    });
+    if (books.rows.length !== 0) {
+      res.render('books/index', { books: books.rows, total: books.count, page, title: `${search} | Books`, search })
+    } else {
+      res.render('page_not_found')
+    }
+    
   }));
 
 
@@ -109,7 +132,6 @@ router.post('/:id', asyncHandler(async(req, res) => {
     book = await Book.findByPk(req.params.id)
     if (book) {
       await book.update(req.body);
-      console.log('AQUI VAMOS SUPER BIEN')
       res.redirect('/');
     } else {
       res.sendStatus(404)

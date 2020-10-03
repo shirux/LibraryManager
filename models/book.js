@@ -2,6 +2,9 @@
 const Sequelize = require('sequelize');
 const moment = require('moment');
 
+/**
+ * Book model, contains title, author, genre and year
+ */
 module.exports = (sequelize) => {
     class Book extends Sequelize.Model { }
     Book.init({
