@@ -1,0 +1,8 @@
+extends ../layout
+
+block main
+    h1 New Book
+    form(method="post" action="/books/new")
+        include form
+        p
+            input(type="submit" value="Create Book")

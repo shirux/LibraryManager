@@ -21,7 +21,7 @@ app.use('/books', books);
 
 // catch 404 and forward to error handler
 app.use( (req, res, next) => {
-  next(createError(404));
+  next(createError(404, `We couldn't find this page. Sorry for the trouble`));
 });
 
 // error handler
@@ -32,9 +32,9 @@ app.use( (err, req, res, next) => {
 
   // render the error page
   res.status(err.status || 500);
-  console.log(err)
-  res.render('error');
+  res.render('page_not_found', { error: err.message });
 });
+
 
 
 module.exports = app;
